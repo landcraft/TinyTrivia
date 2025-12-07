@@ -1,0 +1,5 @@
+{
+  "name": "TinyTrivia",
+  "description": "An app for parents to create fun, interactive, and personalized quizzes for their children. The app gathers information about the child's name, age, interests, and desired learning topics to generate a bespoke quiz using AI.",
+  "requestFramePermissions": []
+}
