@@ -7,6 +7,7 @@ export default defineConfig({
     outDir: 'dist',
   },
   define: {
+    // Ensure process.env is empty object to prevent crashes in some libs
     'process.env': {} 
   }
 });
