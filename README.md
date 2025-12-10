@@ -24,12 +24,14 @@ By leveraging the **Google Gemini API**, TinyTrivia generates personalized quest
 
 TinyTrivia is designed to be stateless and configurable at runtime.
 
-### 1. Pull from GitHub Container Registry
+### Option 1: Docker CLI
+
+#### 1. Pull from GitHub Container Registry
 ```bash
-docker pull ghcr.io/yourusername/tiny-trivia:main
+docker pull ghcr.io/landcraft/tiny-trivia:main
 ```
 
-### 2. Run the Container
+#### 2. Run the Container
 You must provide the necessary environment variables for the app to function.
 
 ```bash
@@ -38,9 +40,34 @@ docker run -d -p 8080:80 \
   -e VITE_SUPABASE_URL="your_supabase_url" \
   -e VITE_SUPABASE_ANON_KEY="your_supabase_anon_key" \
   --name tinytrivia \
-  ghcr.io/yourusername/tiny-trivia:main
+  ghcr.io/landcraft/tiny-trivia:main
 ```
 Visit `http://localhost:8080` to see the app.
+
+### Option 2: Docker Compose
+
+Create a `docker-compose.yml` file in your project directory:
+
+```yaml
+version: '3.8'
+
+services:
+  tinytrivia:
+    image: ghcr.io/landcraft/tiny-trivia:main
+    container_name: tinytrivia
+    ports:
+      - "8080:80"
+    environment:
+      - API_KEY=your_google_gemini_key
+      - VITE_SUPABASE_URL=your_supabase_url
+      - VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    restart: always
+```
+
+Run the application:
+```bash
+docker-compose up -d
+```
 
 ---
 
@@ -96,7 +123,7 @@ create policy "Users can view own quizzes"
 
 1.  **Clone & Install**
     ```bash
-    git clone https://github.com/yourusername/tiny-trivia.git
+    git clone https://github.com/landcraft/tiny-trivia.git
     npm install
     ```
 
