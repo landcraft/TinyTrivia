@@ -1,11 +1,12 @@
 # Stage 1: Build the application
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json* ./
-# If you don't have a lock file yet, npm install will generate one
+# Using npm install with strict-ssl false helps in some restricted environments,
+# but usually standard npm install is fine.
 RUN npm install
 
 # Copy source code
