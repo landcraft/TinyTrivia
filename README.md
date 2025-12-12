@@ -24,27 +24,7 @@ By leveraging the **Google Gemini API**, TinyTrivia generates personalized quest
 
 TinyTrivia is designed to be stateless and configurable at runtime.
 
-### Option 1: Docker CLI
-
-#### 1. Pull from GitHub Container Registry
-```bash
-docker pull ghcr.io/landcraft/tiny-trivia:main
-```
-
-#### 2. Run the Container
-You must provide the necessary environment variables for the app to function.
-
-```bash
-docker run -d -p 8080:80 \
-  -e API_KEY="your_google_gemini_key" \
-  -e VITE_SUPABASE_URL="your_supabase_url" \
-  -e VITE_SUPABASE_ANON_KEY="your_supabase_anon_key" \
-  --name tinytrivia \
-  ghcr.io/landcraft/tiny-trivia:main
-```
-Visit `http://localhost:8080` to see the app.
-
-### Option 2: Docker Compose
+### Option 1: Docker Compose (Recommended)
 
 Create a `docker-compose.yml` file in your project directory:
 
@@ -68,6 +48,26 @@ Run the application:
 ```bash
 docker-compose up -d
 ```
+
+### Option 2: Docker CLI
+
+#### 1. Pull from GitHub Container Registry
+```bash
+docker pull ghcr.io/landcraft/tiny-trivia:main
+```
+
+#### 2. Run the Container
+You must provide the necessary environment variables for the app to function.
+
+```bash
+docker run -d -p 8080:80 \
+  -e API_KEY="your_google_gemini_key" \
+  -e VITE_SUPABASE_URL="your_supabase_url" \
+  -e VITE_SUPABASE_ANON_KEY="your_supabase_anon_key" \
+  --name tinytrivia \
+  ghcr.io/landcraft/tiny-trivia:main
+```
+Visit `http://localhost:8080` to see the app.
 
 ---
 
