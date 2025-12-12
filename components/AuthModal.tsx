@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { XIcon } from './icons/XIcon';
+import { GoogleIcon } from './icons/GoogleIcon';
 import { storageService } from '../services/storageService';
 
 interface AuthModalProps {
@@ -50,6 +51,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    setLoading(true);
+    const { error } = await storageService.signInWithGoogle();
+    if (error) {
+        setError(error);
+        setLoading(false);
+    }
+    // If successful, supabase redirects the page, so no need to stop loading or close modal manually here
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-4">
       <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-[32px] border-4 border-black dark:border-white shadow-pop p-8 relative animate-pop-in">
@@ -69,6 +81,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 {error}
             </div>
         )}
+
+        <button 
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-white border-4 border-black dark:border-white font-bold py-3 rounded-2xl text-xl shadow-sm hover:shadow-pop active:shadow-pop-active active:translate-y-1 transition-all flex items-center justify-center gap-3 mb-6 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+        >
+            <GoogleIcon className="w-6 h-6" />
+            <span>{loading ? "Redirecting..." : "Sign in with Google"}</span>
+        </button>
+
+        <div className="flex items-center gap-4 mb-6">
+            <div className="h-0.5 bg-gray-200 dark:bg-gray-600 flex-1"></div>
+            <span className="text-gray-400 font-bold text-sm">OR</span>
+            <div className="h-0.5 bg-gray-200 dark:bg-gray-600 flex-1"></div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <label className="block text-lg font-bold text-brand-dark dark:text-white mb-2">Email Address</label>

@@ -119,6 +119,13 @@ create policy "Users can view own quizzes"
   using ( auth.uid() = user_id );
 ```
 
+4.  **Enable Google Sign-In**:
+    *   Go to **Authentication -> Providers**.
+    *   Enable **Google**.
+    *   You will need a **Client ID** and **Secret** from the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+    *   **Important**: In Google Cloud Console, add your Supabase Callback URL (found in the Supabase Provider settings) to "Authorized redirect URIs".
+    *   **Important**: In Supabase **Authentication -> URL Configuration**, add your app's URL (e.g., `http://localhost:5173` for local, or your production URL) to **Site URL** or **Redirect URLs**.
+
 ## 📦 Local Development
 
 1.  **Clone & Install**

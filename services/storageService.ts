@@ -55,6 +55,17 @@ export const storageService = {
     return { user: null, error: 'Unknown error' };
   },
 
+  signInWithGoogle: async (): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) return { error: error.message };
+    return { error: null };
+  },
+
   signUp: async (email: string, password: string): Promise<{ user: User | null; error: string | null }> => {
     const { data, error } = await supabase.auth.signUp({
       email,
