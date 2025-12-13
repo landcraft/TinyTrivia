@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { getEnv } from './utils/env';
 
@@ -6,12 +5,18 @@ const supabaseUrl = getEnv('VITE_SUPABASE_URL');
 const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY');
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn("Supabase URL or Key is missing. Check your environment variables or env-config.js. Auth and Database features will not work.");
+  console.error("Supabase Configuration Missing!");
+  console.error("VITE_SUPABASE_URL:", supabaseUrl ? "Set" : "Missing");
+  console.error("VITE_SUPABASE_ANON_KEY:", supabaseAnonKey ? "Set" : "Missing");
+  console.warn("Using placeholder Supabase URL. Authentication and Database features will not work.");
 }
 
-// Fallback to a valid URL format if missing to prevent createClient from crashing the app immediately.
-// Use a placeholder that won't actually work for requests, but satisfies the constructor.
-const validUrl = supabaseUrl && supabaseUrl.startsWith('http') ? supabaseUrl : 'https://placeholder.supabase.co';
+// Ensure URL has protocol
+let validUrl = supabaseUrl || 'https://placeholder.supabase.co';
+if (validUrl && !validUrl.startsWith('http')) {
+    validUrl = `https://${validUrl}`;
+}
+
 const validKey = supabaseAnonKey || 'placeholder-key';
 
 export const supabase = createClient(

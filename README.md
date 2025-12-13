@@ -1,4 +1,3 @@
-
 # TinyTrivia: Big Fun for Bright Minds 🧠✨
 
 TinyTrivia is an interactive, AI-powered web application designed to create bespoke educational quizzes for children. 

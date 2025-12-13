@@ -1,20 +1,32 @@
-# Build Stage
+# Stage 1: Build the application
 FROM node:20-alpine as build
 WORKDIR /app
+
+# Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
+# Copy source code and build
 COPY . .
 RUN npm run build
 
-# Production Stage
+# Stage 2: Serve with Nginx
 FROM nginx:alpine
-# Copy built assets from build stage to nginx serving directory
+
+# Remove default nginx static assets
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy built assets from Stage 1
 COPY --from=build /app/dist /usr/share/nginx/html
-# Copy nginx config
+
+# Copy configuration files
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-# Copy entrypoint script
-COPY docker-entrypoint.sh /
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+# Make entrypoint executable
 RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 80
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
