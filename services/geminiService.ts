@@ -3,16 +3,18 @@ import { GoogleGenAI, Type } from '@google/genai';
 import type { QuizSetupData, QuizQuestion } from '../types';
 import { getEnv } from '../utils/env';
 
-const apiKey = getEnv('API_KEY');
-
-if (!apiKey) {
-  console.warn("API_KEY environment variable not set. Quiz generation will fail.");
-}
-
-const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy-key-to-prevent-crash-on-load' });
-
 export async function generateQuiz(setupData: QuizSetupData): Promise<QuizQuestion[]> {
   const { childName, childAge, interests, topics, customTopics, customSubjects, questionCount, language } = setupData;
+
+  const apiKey = getEnv('API_KEY');
+  
+  if (!apiKey) {
+    console.error("API_KEY is missing from environment variables.");
+    throw new Error("API Key is missing. Please check your application configuration.");
+  }
+
+  // Initialize the client here to ensure we have the runtime env vars
+  const ai = new GoogleGenAI({ apiKey });
 
   const prompt = `
     You are an expert in creating fun, educational, and age-appropriate quizzes for children.
@@ -91,8 +93,11 @@ export async function generateQuiz(setupData: QuizSetupData): Promise<QuizQuesti
     }
 
     return quizData;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating quiz with Gemini:", error);
+    if (error.message && error.message.includes('API key not valid')) {
+        throw new Error("Invalid API Key. Please check your deployment settings.");
+    }
     throw new Error("Failed to generate the quiz. Please try again.");
   }
 }
