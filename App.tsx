@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import type { AppState, QuizQuestion, QuizSetupData, User, SavedQuiz } from './types';
 import { QuizSetup } from './components/QuizSetup';
@@ -7,6 +6,7 @@ import { QuizSummary } from './components/QuizSummary';
 import { MenuDropdown } from './components/MenuDropdown';
 import { LandingPage } from './components/LandingPage';
 import { AuthModal } from './components/AuthModal';
+import { ContactModal } from './components/ContactModal';
 import { Dashboard } from './components/Dashboard';
 import { SharedQuizView } from './components/SharedQuizView';
 import { storageService } from './services/storageService';
@@ -81,6 +81,10 @@ const App: React.FC = () => {
   // Auth State
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'NONE' | 'CREATE_QUIZ'>('NONE');
+
+  // Contact State
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   // Shared Quiz State
   const [sharedQuizId, setSharedQuizId] = useState<string | null>(null);
@@ -150,12 +154,28 @@ const App: React.FC = () => {
   const handleLoginSuccess = (user: User) => {
     setUser(user);
     setIsAuthModalOpen(false);
+    
+    // Check pending actions
+    if (pendingAction === 'CREATE_QUIZ') {
+        setAppState('SETUP');
+        setPendingAction('NONE');
+    }
   };
 
   const handleLogout = async () => {
     await storageService.signOut();
     setUser(null);
     setAppState('LANDING');
+  };
+
+  // Protected Actions
+  const handleCreateQuizClick = () => {
+      if (user) {
+          setAppState('SETUP');
+      } else {
+          setPendingAction('CREATE_QUIZ');
+          setIsAuthModalOpen(true);
+      }
   };
 
   // Quiz Logic Handlers
@@ -183,6 +203,7 @@ const App: React.FC = () => {
 
   const handleSaveQuiz = async () => {
     if (!user) {
+      // Should basically always be user if we enforced create, but for shared quizzes or edge cases:
       setIsAuthModalOpen(true);
       return;
     }
@@ -211,9 +232,9 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (appState) {
       case 'LANDING':
-        return <LandingPage onCreateQuiz={() => setAppState('SETUP')} />;
+        return <LandingPage onCreateQuiz={handleCreateQuizClick} />;
       case 'DASHBOARD':
-        return user ? <Dashboard user={user} onCreateNew={() => setAppState('SETUP')} /> : <LandingPage onCreateQuiz={() => setAppState('SETUP')} />;
+        return user ? <Dashboard user={user} onCreateNew={() => setAppState('SETUP')} /> : <LandingPage onCreateQuiz={handleCreateQuizClick} />;
       case 'SETUP':
         return <QuizSetup onQuizGenerated={handleQuizGenerated} setGenerating={setGenerating} setChildName={setChildName} />;
       case 'GENERATING':
@@ -264,12 +285,19 @@ const App: React.FC = () => {
         onLogoutClick={handleLogout}
         onDashboardClick={() => setAppState('DASHBOARD')}
         onHomeClick={() => setAppState('LANDING')}
+        onContactClick={() => setIsContactModalOpen(true)}
       />
 
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+        onClose={() => { setIsAuthModalOpen(false); setPendingAction('NONE'); }} 
         onLoginSuccess={handleLoginSuccess} 
+      />
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        userEmail={user?.email}
       />
 
       {!isSharedView && (

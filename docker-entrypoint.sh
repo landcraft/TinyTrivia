@@ -1,25 +1,25 @@
 #!/bin/sh
 
-# Path to the config file in the Nginx html directory
-CONFIG_FILE="/usr/share/nginx/html/env-config.js"
+# Path to the config file
+env_config_file="/usr/share/nginx/html/env-config.js"
 
-# Recreate the config file
-echo "window.__ENV__ = {" > $CONFIG_FILE
+# Start the file
+echo "window.__ENV__ = {" > "$env_config_file"
 
-# Inject specific environment variables
-# This allows you to change keys at runtime without rebuilding the Docker image
-if [ -n "$API_KEY" ]; then
-  echo "  \"API_KEY\": \"$API_KEY\"," >> $CONFIG_FILE
-fi
-if [ -n "$VITE_SUPABASE_URL" ]; then
-  echo "  \"VITE_SUPABASE_URL\": \"$VITE_SUPABASE_URL\"," >> $CONFIG_FILE
-fi
-if [ -n "$VITE_SUPABASE_ANON_KEY" ]; then
-  echo "  \"VITE_SUPABASE_ANON_KEY\": \"$VITE_SUPABASE_ANON_KEY\"," >> $CONFIG_FILE
-fi
+# Read environment variables and inject them
+# We specifically look for API_KEY and VITE_ prefixed variables
+for var in $(env | grep -E '^(API_KEY|VITE_)'); do
+    key=$(echo "$var" | cut -d '=' -f 1)
+    value=$(echo "$var" | cut -d '=' -f 2-)
+    
+    # Escape quotes in value to prevent JS syntax errors
+    value=$(echo "$value" | sed "s/'/\\\'/g")
+    
+    echo "  \"$key\": \"$value\"," >> "$env_config_file"
+done
 
 # Close the object
-echo "};" >> $CONFIG_FILE
+echo "};" >> "$env_config_file"
 
-# Execute the passed command (usually "nginx -g 'daemon off;'")
+# Execute the passed command (usually nginx)
 exec "$@"

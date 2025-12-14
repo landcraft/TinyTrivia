@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from '../types';
 import { SunIcon, MoonIcon } from './icons/ThemeIcons';
@@ -11,10 +10,11 @@ interface MenuDropdownProps {
   onLogoutClick: () => void;
   onDashboardClick: () => void;
   onHomeClick: () => void;
+  onContactClick: () => void;
 }
 
 export const MenuDropdown: React.FC<MenuDropdownProps> = ({ 
-  user, isDarkMode, toggleTheme, onLoginClick, onLogoutClick, onDashboardClick, onHomeClick 
+  user, isDarkMode, toggleTheme, onLoginClick, onLogoutClick, onDashboardClick, onHomeClick, onContactClick
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -70,7 +70,7 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({
             {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
           </button>
 
-           <button onClick={() => alert("Contact us at help@tinytrivia.com")} className="text-left px-4 py-3 font-bold text-brand-dark dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+           <button onClick={() => { onContactClick(); setIsOpen(false); }} className="text-left px-4 py-3 font-bold text-brand-dark dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
             ❓ Help & Contact
           </button>
 

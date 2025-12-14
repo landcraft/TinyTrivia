@@ -1,25 +1,30 @@
 import { createClient } from '@supabase/supabase-js';
 import { getEnv } from './utils/env';
 
-const supabaseUrl = getEnv('VITE_SUPABASE_URL');
-const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY');
+const rawUrl = getEnv('VITE_SUPABASE_URL');
+const rawKey = getEnv('VITE_SUPABASE_ANON_KEY');
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("Supabase Configuration Missing!");
-  console.error("VITE_SUPABASE_URL:", supabaseUrl ? "Set" : "Missing");
-  console.error("VITE_SUPABASE_ANON_KEY:", supabaseAnonKey ? "Set" : "Missing");
-  console.warn("Using placeholder Supabase URL. Authentication and Database features will not work.");
+// Helper to validate URL
+const isValidUrl = (urlString: string) => {
+  try { 
+    return Boolean(new URL(urlString)); 
+  } catch(e) { 
+    return false; 
+  }
+};
+
+let supabaseUrl = rawUrl;
+let supabaseAnonKey = rawKey;
+
+// Validation Logic
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('your_supabase_url')) {
+  console.warn("Supabase Configuration is missing or using default placeholders.");
+  // We use a safe dummy URL to prevent the app from crashing on load, 
+  // but Auth/DB calls will fail gracefully later.
+  supabaseUrl = 'https://placeholder.supabase.co';
+  supabaseAnonKey = 'placeholder-key';
+} else if (!supabaseUrl.startsWith('http')) {
+  supabaseUrl = `https://${supabaseUrl}`;
 }
 
-// Ensure URL has protocol
-let validUrl = supabaseUrl || 'https://placeholder.supabase.co';
-if (validUrl && !validUrl.startsWith('http')) {
-    validUrl = `https://${validUrl}`;
-}
-
-const validKey = supabaseAnonKey || 'placeholder-key';
-
-export const supabase = createClient(
-  validUrl, 
-  validKey
-);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
